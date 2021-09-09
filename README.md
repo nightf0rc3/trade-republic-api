@@ -17,16 +17,16 @@ For more please check the examples folder.
 const trapi = new TradeRepublicApi({});
 
 trapi.on('connected', async () => {
-  const data =
-    (await trapi.oneShot) <
-    Ticker >
-    ('ticker',
-    {
-      id: 'US90364P1057.LSX',
-    });
+  const data = await trapi.oneShot<Ticker>('ticker', {
+    id: 'US90364P1057.LSX',
+  });
   console.log(JSON.stringify(data));
   console.log(`Ask Price: ${data.payload.ask.price}`);
 });
 
 trapi.connect();
 ```
+
+## Supported Topics
+- ticker
+- 
