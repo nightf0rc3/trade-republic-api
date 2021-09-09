@@ -44,7 +44,9 @@ export interface Ticker {
 
 interface Options {
   locale: string;
+  apiEndpoint: string;
   keepSentMessageHistory: boolean;
+  autoReconnect: boolean;
 }
 
 export class TradeRepublicApi extends EventEmitter {
@@ -55,21 +57,27 @@ export class TradeRepublicApi extends EventEmitter {
   private sessionToken = '';
   private sentMessages = new Map<number, unknown>();
   private keepSentMessageHistory = false;
+  private autoReconnect = false;
+  private apiEndpoint = '';
 
   private static DEFAULT_LOCALE = 'de';
+  private static DEFAULT_APIENDPOINT = 'wss://api.traderepublic.com';
   private static CONNECTED_CONFIRMED_MSG = 'connected';
 
   constructor(options?: Partial<Options>) {
     super();
     this.locale = options?.locale || TradeRepublicApi.DEFAULT_LOCALE;
     this.keepSentMessageHistory = options?.keepSentMessageHistory || false;
+    this.autoReconnect = options?.autoReconnect || false;
+    this.apiEndpoint =
+      options?.apiEndpoint || TradeRepublicApi.DEFAULT_APIENDPOINT;
   }
 
   /**
    * establish a connection to the Trade Republic websocket
    */
   public connect() {
-    this.ws = new WebSocket('wss://api.traderepublic.com');
+    this.ws = new WebSocket(this.apiEndpoint);
     this.ws.on('open', () => {
       this.send(`connect 21 ${JSON.stringify({ locale: this.locale })}`);
     });
@@ -78,6 +86,11 @@ export class TradeRepublicApi extends EventEmitter {
     });
     this.ws.on('close', () => {
       this.emit('close');
+      if (this.autoReconnect) {
+        this.subCounter = 0;
+        this.connect();
+        // TODO: re-subscribe active subscriptions?
+      }
     });
   }
 
