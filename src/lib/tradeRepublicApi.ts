@@ -77,6 +77,7 @@ export class TradeRepublicApi extends EventEmitter {
    * establish a connection to the Trade Republic websocket
    */
   public connect() {
+    this.subCounter = 1;
     this.ws = new WebSocket(this.apiEndpoint);
     this.ws.on('open', () => {
       this.send(`connect 21 ${JSON.stringify({ locale: this.locale })}`);
@@ -92,6 +93,10 @@ export class TradeRepublicApi extends EventEmitter {
         // TODO: re-subscribe active subscriptions?
       }
     });
+  }
+
+  public disconnect() {
+    this.ws.terminate();
   }
 
   /**
