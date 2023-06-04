@@ -1,5 +1,4 @@
-import { TradeRepublicApi } from '..';
-import { Ticker } from '../lib/tradeRepublicApi';
+import { Ticker, TradeRepublicApi } from '..';
 
 (() => {
   const trapi = new TradeRepublicApi({});
@@ -10,6 +9,7 @@ import { Ticker } from '../lib/tradeRepublicApi';
     });
     console.log(JSON.stringify(data));
     console.log(`Ask Price: ${data.payload.ask.price}`);
+    trapi.disconnect();
   });
 
   trapi.connect();

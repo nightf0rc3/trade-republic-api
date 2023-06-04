@@ -17,6 +17,7 @@
     "exponentiate",
     "globby",
     "isin",
+    "Kpis",
     "libauth",
     "mkdir",
     "prettierignore",
@@ -25,8 +26,11 @@
     "transpiled",
     "trapi",
     "typedoc",
+    "unfollow",
     "unsub",
-    "untracked"
+    "untracked",
+    "watchlist",
+    "watchlists"
   ],
   "flagWords": [],
   "ignorePaths": [
@@ -34,6 +38,7 @@
     "package-lock.json",
     "yarn.lock",
     "tsconfig.json",
-    "node_modules/**"
+    "node_modules/**",
+    "src/examples/**"
   ]
 }
