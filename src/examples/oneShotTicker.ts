@@ -1,5 +1,4 @@
-import { TradeRepublicApi } from '..';
-import { Ticker } from '../lib/tradeRepublicApi';
+import { Ticker, TradeRepublicApi } from '..';
 
 (() => {
   const trapi = new TradeRepublicApi({});

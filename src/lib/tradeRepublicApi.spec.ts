@@ -1,7 +1,6 @@
 import anyTest, { TestInterface } from 'ava';
 import getPort from 'get-port';
 import { Server } from 'ws';
-
 import { TradeRepublicApi } from './tradeRepublicApi';
 
 interface CustomContext {
@@ -36,6 +35,7 @@ test.beforeEach(async (t) => {
 
 test.afterEach.always((t) => {
   t.context.wss.close();
+  t.context.endpoint = null;
 });
 
 function waitForServerMessage(wss: Server): Promise<string> {
@@ -68,7 +68,7 @@ test('static - message history is initially empty', (t) => {
 });
 
 test('websocket connect - correct initialization message', async (t) => {
-  const TR_INIT_REGEX = RegExp(`connect 21 \\{"locale":".*"\\}`);
+  const TR_INIT_REGEX = RegExp(`connect 26 \\{"locale":".*"\\}`);
   // delay connect until server is ready
   const trapi = new TradeRepublicApi({
     apiEndpoint: t.context.endpoint,
@@ -94,12 +94,12 @@ test('websocket connect - trigger connect event', async (t) => {
 });
 
 test('websocket oneShot - message is formatted correctly', async (t) => {
-  const msg = `1 test ${JSON.stringify({
+  const msg = `1 cash ${JSON.stringify({
     test: 'test',
   })}`;
 
   const msgClient = `sub 1 ${JSON.stringify({
-    type: 'test',
+    type: 'cash',
     token: '',
     test: 'test',
   })}`;
@@ -110,9 +110,9 @@ test('websocket oneShot - message is formatted correctly', async (t) => {
 
   t.context.wss.on('connection', (ws) => {
     ws.on('message', (message) => {
-      if (message.toString().indexOf('connect 21') > -1) {
+      if (message.toString().indexOf('connect 26') > -1) {
         ws.send('connected');
-      } else if (message == msgClient) {
+      } else if (message.toString() == msgClient) {
         ws.send(msg);
         ws.close();
       }
@@ -125,9 +125,9 @@ test('websocket oneShot - message is formatted correctly', async (t) => {
   trapi.connect();
 
   await waitForClientEvent(trapi, 'connected');
-  const data = await trapi.oneShot<TestResponse>('test', { test: 'test' });
+  const data = await trapi.oneShot<TestResponse>('cash', { test: 'test' });
   t.is(data.subId, 1);
-  t.is(data.type, 'test');
+  t.is(data.type, 'cash');
   t.is(data.payload.test, 'test');
 });
 
@@ -153,7 +153,7 @@ test('subTicker', async (t) => {
 
   t.context.wss.on('connection', (ws) => {
     ws.on('message', (message) => {
-      if (message.toString().indexOf('connect 21') > -1) {
+      if (message.toString().indexOf('connect 26') > -1) {
         ws.send('connected');
       } else if (message == msgClient) {
         ws.send(msg);
